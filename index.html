@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Toán Cùng Thầy Tôn Tú - Véctơ Trong Không Gian & Oxyz</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- KaTeX CDN & Auto-render extension for mathematical typesetting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            overflow: hidden;
+        }
+        .left-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .left-sidebar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+        }
+        .left-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 4px;
+        }
+        .left-sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 116, 139, 1);
+        }
+        /* 3D Label Overlays */
+        .label-3d {
+            position: absolute;
+            pointer-events: none;
+            transition: opacity 0.15s ease-out;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            font-weight: 700;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+        }
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        /* Glow Effects */
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+        }
+        .glow-emerald {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+        .glow-purple {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+        .katex {
+            font-size: 1.05em;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen w-screen flex flex-row overflow-hidden">
+
+    <!-- ================================================================= -->
+    <!-- LEFT SIDEBAR: CONTROLS, PRESETS & STEP-BY-STEP MATH FORMULAS     -->
+    <!-- ================================================================= -->
+    <aside class="left-sidebar w-[370px] md:w-[420px] shrink-0 h-full flex flex-col bg-slate-900/95 border-r border-slate-800 z-20 shadow-2xl overflow-y-auto p-4 gap-3.5">
+        
+        <!-- HEADER TOP BANNER: HỌC TOÁN CÙNG THẦY TÔN TÚ -->
+        <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 font-black text-center py-2.5 px-3 rounded-xl shadow-lg border border-amber-300 text-sm md:text-base tracking-wider uppercase flex items-center justify-center gap-2 glow-gold">
+            <i class="fa-solid fa-graduation-cap text-lg"></i>
+            <span>HỌC TOÁN CÙNG THẦY TÔN TÚ</span>
+        </div>
+
+        <!-- HEADER BADGE -->
+        <div class="glass-card p-3 rounded-xl flex items-center gap-3 border border-cyan-500/30 shadow-lg">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-700 flex items-center justify-center text-white text-lg font-black shadow-md shrink-0">
+                <i class="fa-solid fa-cube"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-sm md:text-base leading-tight tracking-wide text-white">
+                    VÉCTƠ TRONG KHÔNG GIAN OXYZ
+                </h1>
+                <p class="text-[11px] text-cyan-400 font-medium mt-0.5">
+                    Hình hộp chữ nhật <span class="math-render">$ABCD.A'B'C'D'$</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- SECTION 1: CHẾ ĐỘ PHÉP TOÁN (MODE SELECTOR) -->
+        <div class="space-y-2">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                <span><i class="fa-solid fa-calculator text-cyan-400 mr-1"></i> Phép toán véctơ</span>
+                <span class="text-[10px] text-slate-500 font-normal">Chọn chế độ</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <button id="tab-add" class="mode-tab p-2.5 rounded-xl border border-cyan-500/50 bg-cyan-950/40 hover:bg-cyan-900/40 text-left transition flex items-center gap-2 group active">
+                    <i class="fa-solid fa-plus text-cyan-400"></i>
+                    <div>
+                        <div class="font-bold text-xs text-cyan-300">Cộng 2 véctơ</div>
+                        <div class="text-[11px] text-slate-400 math-render">$\vec{u} + \vec{v} = \vec{w}$</div>
+                    </div>
+                </button>
+
+                <button id="tab-cross" class="mode-tab p-2.5 rounded-xl border border-amber-500/30 bg-slate-800/40 hover:bg-amber-950/30 text-left transition flex items-center gap-2 group">
+                    <i class="fa-solid fa-xmark text-amber-400"></i>
+                    <div>
+                        <div class="font-bold text-xs text-slate-300 group-[.active]:text-amber-300">Tích có hướng</div>
+                        <div class="text-[11px] text-slate-400 math-render">$\vec{u} \times \vec{v} = \vec{w}$</div>
+                    </div>
+                </button>
+
+                <button id="tab-box" class="mode-tab p-2.5 rounded-xl border border-purple-500/30 bg-slate-800/40 hover:bg-purple-950/30 text-left transition flex items-center gap-2 group">
+                    <i class="fa-solid fa-cube text-purple-400"></i>
+                    <div>
+                        <div class="font-bold text-xs text-slate-300 group-[.active]:text-purple-300">Quy tắc hình hộp</div>
+                        <div class="text-[11px] text-slate-400 math-render">$\vec{AB}+\vec{AD}+\vec{AA'}$</div>
+                    </div>
+                </button>
+
+                <button id="tab-custom" class="mode-tab p-2.5 rounded-xl border border-slate-700 bg-slate-800/40 hover:bg-slate-700/40 text-left transition flex items-center gap-2 group">
+                    <i class="fa-solid fa-sliders text-emerald-400"></i>
+                    <div>
+                        <div class="font-bold text-xs text-slate-300 group-[.active]:text-emerald-300">Tùy chọn đỉnh</div>
+                        <div class="text-[11px] text-slate-400">Chọn đỉnh tự do</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION 2: DANH SÁCH PRESET MẪU SGK -->
+        <div class="space-y-2">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <i class="fa-solid fa-star text-amber-400 mr-1"></i> Mẫu ví dụ chuẩn trong SGK
+            </div>
+            
+            <div class="grid grid-cols-1 gap-1.5 text-xs">
+                <button id="preset-1" class="preset-btn p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:bg-slate-800/80 text-left transition flex items-center justify-between">
+                    <div class="font-medium text-slate-200 math-render">1. Quy tắc HBH đáy: $\vec{AB} + \vec{AD} = \vec{AC}$</div>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 ml-1 shrink-0"></i>
+                </button>
+                <button id="preset-2" class="preset-btn p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:bg-slate-800/80 text-left transition flex items-center justify-between">
+                    <div class="font-medium text-slate-200 math-render">2. Đường chéo hình hộp: $\vec{AB} + \vec{AD} + \vec{AA'} = \vec{AC'}$</div>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 ml-1 shrink-0"></i>
+                </button>
+                <button id="preset-3" class="preset-btn p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:bg-slate-800/80 text-left transition flex items-center justify-between">
+                    <div class="font-medium text-amber-300 math-render">3. Tích có hướng đáy: $\vec{AB} \times \vec{AD} \rightarrow$ Véctơ $\vec{Oz}$ ($\vec{AA'}$)</div>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-amber-500 ml-1 shrink-0"></i>
+                </button>
+                <button id="preset-4" class="preset-btn p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:bg-slate-800/80 text-left transition flex items-center justify-between">
+                    <div class="font-medium text-amber-300 math-render">4. Tích có hướng mặt bên: $\vec{AB} \times \vec{AA'} \rightarrow$ Véctơ ngược $\vec{Oy}$</div>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-amber-500 ml-1 shrink-0"></i>
+                </button>
+            </div>
+        </div>
+
+        <hr class="border-slate-800">
+
+        <!-- SECTION 3: TÙY CHỈNH KÍCH THƯỚC HÌNH HỘP & VÉCTƠ -->
+        <div class="space-y-3">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                <span><i class="fa-solid fa-ruler-combined text-cyan-400 mr-1"></i> Tùy chỉnh kích thước hình hộp</span>
+                <button id="btn-reset-dim" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 transition">
+                    Khôi phục (4, 3, 3)
+                </button>
+            </div>
+
+            <!-- Dimension Sliders -->
+            <div class="grid grid-cols-3 gap-2">
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800 text-center">
+                    <div class="text-[11px] text-red-400 font-bold mb-1">Cạnh a (Ox)</div>
+                    <input type="range" id="slider-a" min="1" max="6" step="0.5" value="4" class="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-red-500">
+                    <div id="val-a" class="font-mono text-xs font-bold text-slate-200 mt-1">4.0</div>
+                </div>
+
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800 text-center">
+                    <div class="text-[11px] text-emerald-400 font-bold mb-1">Cạnh b (Oy)</div>
+                    <input type="range" id="slider-b" min="1" max="6" step="0.5" value="3" class="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-emerald-500">
+                    <div id="val-b" class="font-mono text-xs font-bold text-slate-200 mt-1">3.0</div>
+                </div>
+
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800 text-center">
+                    <div class="text-[11px] text-blue-400 font-bold mb-1">Cạnh c (Oz)</div>
+                    <input type="range" id="slider-c" min="1" max="6" step="0.5" value="3" class="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-blue-500">
+                    <div id="val-c" class="font-mono text-xs font-bold text-slate-200 mt-1">3.0</div>
+                </div>
+            </div>
+
+            <!-- Custom Vector Selectors -->
+            <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 space-y-2">
+                <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                    <span>Chọn 2 véctơ thành phần:</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <!-- Vector 1 Selector -->
+                    <div>
+                        <span class="text-cyan-400 font-bold block mb-1 math-render">Véctơ 1 ($\vec{u}$):</span>
+                        <div class="flex items-center gap-1">
+                            <select id="sel-u-from" class="bg-slate-900 text-slate-100 border border-slate-700 rounded px-1.5 py-1 text-xs w-full">
+                                <option value="A" selected>Đỉnh A</option>
+                                <option value="B">Đỉnh B</option>
+                                <option value="C">Đỉnh C</option>
+                                <option value="D">Đỉnh D</option>
+                                <option value="A'">Đỉnh A'</option>
+                                <option value="B'">Đỉnh B'</option>
+                                <option value="C'">Đỉnh C'</option>
+                                <option value="D'">Đỉnh D'</option>
+                            </select>
+                            <span class="text-slate-500">→</span>
+                            <select id="sel-u-to" class="bg-slate-900 text-slate-100 border border-slate-700 rounded px-1.5 py-1 text-xs w-full">
+                                <option value="A">Đỉnh A</option>
+                                <option value="B" selected>Đỉnh B</option>
+                                <option value="C">Đỉnh C</option>
+                                <option value="D">Đỉnh D</option>
+                                <option value="A'">Đỉnh A'</option>
+                                <option value="B'">Đỉnh B'</option>
+                                <option value="C'">Đỉnh C'</option>
+                                <option value="D'">Đỉnh D'</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Vector 2 Selector -->
+                    <div>
+                        <span class="text-emerald-400 font-bold block mb-1 math-render">Véctơ 2 ($\vec{v}$):</span>
+                        <div class="flex items-center gap-1">
+                            <select id="sel-v-from" class="bg-slate-900 text-slate-100 border border-slate-700 rounded px-1.5 py-1 text-xs w-full">
+                                <option value="A" selected>Đỉnh A</option>
+                                <option value="B">Đỉnh B</option>
+                                <option value="C">Đỉnh C</option>
+                                <option value="D">Đỉnh D</option>
+                                <option value="A'">Đỉnh A'</option>
+                                <option value="B'">Đỉnh B'</option>
+                                <option value="C'">Đỉnh C'</option>
+                                <option value="D'">Đỉnh D'</option>
+                            </select>
+                            <span class="text-slate-500">→</span>
+                            <select id="sel-v-to" class="bg-slate-900 text-slate-100 border border-slate-700 rounded px-1.5 py-1 text-xs w-full">
+                                <option value="A">Đỉnh A</option>
+                                <option value="B">Đỉnh B</option>
+                                <option value="C">Đỉnh C</option>
+                                <option value="D" selected>Đỉnh D</option>
+                                <option value="A'">Đỉnh A'</option>
+                                <option value="B'">Đỉnh B'</option>
+                                <option value="C'">Đỉnh C'</option>
+                                <option value="D'">Đỉnh D'</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: TÙY CHỌN HIỂN THỊ -->
+        <div class="space-y-2">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <i class="fa-solid fa-eye text-cyan-400 mr-1"></i> Hiển thị trợ giúp 3D
+            </div>
+
+            <div class="grid grid-cols-2 gap-1.5 text-xs">
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/40 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                    <input type="checkbox" id="toggle-axes" checked class="w-3.5 h-3.5 accent-cyan-500 rounded">
+                    <span class="text-slate-300 math-render">Trục $Oxyz$ & Grid</span>
+                </label>
+
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/40 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                    <input type="checkbox" id="toggle-coords" checked class="w-3.5 h-3.5 accent-cyan-500 rounded">
+                    <span class="text-slate-300">Tọa độ các đỉnh</span>
+                </label>
+
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/40 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                    <input type="checkbox" id="toggle-parallelogram" checked class="w-3.5 h-3.5 accent-amber-500 rounded">
+                    <span class="text-slate-300">Mặt phẳng HBH</span>
+                </label>
+
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/40 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                    <input type="checkbox" id="toggle-autorotate" class="w-3.5 h-3.5 accent-cyan-500 rounded">
+                    <span class="text-slate-300">Tự động xoay 3D</span>
+                </label>
+            </div>
+        </div>
+
+        <hr class="border-slate-800">
+
+        <!-- SECTION 5: THẺ TOÁN HỌC & CÔNG THỨC CHI TIẾT (DYNAMIC KATEX) -->
+        <div class="glass-card rounded-xl p-3 flex flex-col gap-3 border-l-4 border-cyan-500 shadow-xl mt-auto" id="math-card-container">
+            
+            <!-- Header status & badge -->
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                <span id="math-status-badge" class="px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 glow-cyan">
+                    PHÉP CỘNG 2 VÉCTƠ
+                </span>
+                <span id="math-status-sub" class="text-[11px] font-semibold text-slate-400">
+                    Quy tắc Hình bình hành
+                </span>
+            </div>
+
+            <!-- Tọa độ 2 Véctơ đầu vào -->
+            <div class="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800 space-y-1.5 text-xs">
+                <div class="text-[11px] font-bold text-slate-400">1. Tọa độ véctơ thành phần & Độ dài:</div>
+                <div id="katex-u" class="overflow-x-auto py-0.5"></div>
+                <div id="katex-v" class="overflow-x-auto py-0.5"></div>
+            </div>
+
+            <!-- Bảng tính chi tiết phép toán -->
+            <div class="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800 space-y-2 text-xs">
+                <div class="text-[11px] font-bold text-amber-400 flex items-center gap-1">
+                    <i class="fa-solid fa-square-root-variable"></i>
+                    <span>2. Công thức & Bước tính chi tiết:</span>
+                </div>
+                
+                <!-- Main formula display -->
+                <div id="katex-formula" class="overflow-x-auto py-1 border-y border-slate-800/80"></div>
+                
+                <!-- Result vector & magnitude -->
+                <div id="katex-result" class="overflow-x-auto font-bold text-cyan-300 py-0.5"></div>
+            </div>
+
+            <!-- Thuộc tính hình học nâng cao -->
+            <div id="geo-properties" class="bg-slate-950/60 p-2 rounded-lg text-[11px] space-y-1 border border-slate-800 text-slate-300">
+                <div id="katex-dot-angle"></div>
+                <div id="katex-area-vol"></div>
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- ================================================================= -->
+    <!-- RIGHT AREA: 3D VIEWPORT CONTAINER (THREE.JS)                     -->
+    <!-- ================================================================= -->
+    <main class="flex-1 h-full relative overflow-hidden bg-slate-950">
+
+        <!-- 3D WebGL Canvas -->
+        <div id="canvas-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+        <!-- Dynamic 3D Floating Labels Overlay -->
+        <div id="labels-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10">
+            <!-- Labels for Vertices A, B, C, D, A', B', C', D' -->
+            <div id="lbl-A" class="label-3d px-2 py-0.5 rounded bg-slate-900/90 text-red-400 text-xs border border-red-500/40">A(0,0,0)</div>
+            <div id="lbl-B" class="label-3d px-2 py-0.5 rounded bg-slate-900/90 text-red-400 text-xs border border-red-500/40">B</div>
+            <div id="lbl-C" class="label-3d px-2 py-0.5 rounded bg-slate-900/90 text-slate-200 text-xs border border-slate-700">C</div>
+            <div id="lbl-D" class="label-3d px-2 py-0.5 rounded bg-slate-900/90 text-emerald-400 text-xs border border-emerald-500/40">D</div>
+            <div id="lbl-A1" class="label-3d px-2 py-0.5 rounded bg-slate-900/90 text-blue-400 text-xs border border-blue-500/40">A'</div>
+            <div id="lbl-B1" class="label-3d px-2 py-0.5 rounded bg-slate-900/90 text-slate-200 text-xs border border-slate-700">B'</div>
+            <div id="lbl-C1" class="label-3d px-2 py-0.5 rounded bg-slate-900/90 text-purple-400 text-xs border border-purple-500/40">C'</div>
+            <div id="lbl-D1" class="label-3d px-2 py-0.5 rounded bg-slate-900/90 text-slate-200 text-xs border border-slate-700">D'</div>
+
+            <!-- Dynamic Mathematical Labels for Vectors -->
+            <div id="lbl-vec-u" class="label-3d px-2 py-1 rounded-md bg-cyan-600/90 text-white text-xs border border-cyan-300 shadow-lg math-render">$\vec{u}$</div>
+            <div id="lbl-vec-v" class="label-3d px-2 py-1 rounded-md bg-emerald-600/90 text-white text-xs border border-emerald-300 shadow-lg math-render">$\vec{v}$</div>
+            <div id="lbl-vec-w" class="label-3d px-2.5 py-1 rounded-md bg-amber-500 text-slate-950 font-black text-xs border-2 border-white shadow-xl glow-gold math-render">$\vec{w}$</div>
+        </div>
+
+        <!-- Top Right Utility Controls -->
+        <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5 pointer-events-auto">
+            <button id="btn-reset-cam" class="p-2 rounded-xl glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition text-xs shadow-lg" title="Đặt lại góc nhìn chuẩn">
+                <i class="fa-solid fa-camera-rotate mr-1"></i> Góc nhìn 3D chuẩn
+            </button>
+            <button id="btn-fullscreen" class="p-2 rounded-xl glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition text-xs shadow-lg" title="Toàn màn hình">
+                <i class="fa-solid fa-expand"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Legend & Controls Instruction -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <div class="glass-card px-4 py-2 rounded-full text-xs text-slate-300 flex items-center gap-4 pointer-events-auto shadow-xl border border-slate-800">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                    <span class="font-bold text-red-400">Trục Ox</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                    <span class="font-bold text-emerald-400">Trục Oy</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+                    <span class="font-bold text-blue-400">Trục Oz</span>
+                </div>
+                <span class="text-slate-700">|</span>
+                <span class="text-slate-300"><i class="fa-solid fa-mouse text-cyan-400 mr-1"></i> Xoay chuột trái • Cuộn để Zoom</span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- THREE.JS 3D ENGINE & MATHEMATICAL VECTOR CALCULATIONS             -->
+    <!-- ================================================================= -->
+    <script>
+        /**
+         * 3D VECTOR & OXYZ COORDINATE ENGINE FOR HIGH SCHOOL MATH 12
+         * HỌC TOÁN CÙNG THẦY TÔN TÚ
+         */
+
+        // App state
+        const state = {
+            dim: { a: 4.0, b: 3.0, c: 3.0 },
+            mode: 'ADD', // 'ADD', 'CROSS', 'BOX', 'CUSTOM'
+            preset: 'preset-1',
+            u: { from: 'A', to: 'B' },
+            v: { from: 'A', to: 'D' },
+            toggles: {
+                axes: true,
+                coords: true,
+                parallelogram: true,
+                autoRotate: false
+            }
+        };
+
+        // Three.js Globals
+        let scene, camera, renderer, controls;
+        let cuboidMesh, cuboidEdges;
+        let axesGroup, gridHelper;
+        let vecUMesh, vecVMesh, vecWMesh;
+        let constructionLinesMesh, parallelogramPlaneMesh;
+        let rightAngleIndicatorsGroup;
+        let vertexPointMeshes = {};
+
+        const container = document.getElementById('canvas-container');
+
+        // Color Palette
+        const colors = {
+            bg: 0x090d16,
+            cuboidFill: 0x1e293b,
+            cuboidBorder: 0x0284c7,
+            ox: 0xef4444, // Red
+            oy: 0x10b981, // Emerald
+            oz: 0x3b82f6, // Blue
+            vecU: 0x06b6d4, // Cyan
+            vecV: 0x10b981, // Emerald Green
+            vecW: 0xf59e0b, // Amber Gold
+            vecBox: 0xa855f7, // Purple
+            paraFill: 0xf59e0b
+        };
+
+        // Initialize 3D World
+        function init3D() {
+            // 1. Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(colors.bg);
+
+            // 2. Camera
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(10, 8, 12);
+
+            // 3. Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // 4. Orbit Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(2, 1.5, -1.5);
+
+            // 5. Lighting
+            const ambient = new THREE.AmbientLight(0xffffff, 0.75);
+            scene.add(ambient);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+            dirLight.position.set(15, 25, 10);
+            dirLight.castShadow = true;
+            scene.add(dirLight);
+
+            const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
+            fillLight.position.set(-10, -10, -10);
+            scene.add(fillLight);
+
+            // 6. Build Geometry Containers
+            createOxyzAxes();
+            createCuboid();
+            createRightAngleGroup();
+
+            // 7. Initial calculations & listeners
+            updateScene();
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        /**
+         * Mathematical Coordinate Conversion to Three.js Space
+         * Math: Ox (Right), Oy (Depth/Inwards), Oz (Vertical UP)
+         * Three.js: X_3d = x, Y_3d = z, Z_3d = -y
+         */
+        function mathTo3D(x, y, z) {
+            return new THREE.Vector3(x, z, -y);
+        }
+
+        // Calculate 8 vertices of Rectangular Cuboid ABCD.A'B'C'D'
+        function getCuboidVertices(a, b, c) {
+            return {
+                'A':  { math: { x: 0, y: 0, z: 0 }, pos3D: mathTo3D(0, 0, 0) },
+                'B':  { math: { x: a, y: 0, z: 0 }, pos3D: mathTo3D(a, 0, 0) },
+                'C':  { math: { x: a, y: b, z: 0 }, pos3D: mathTo3D(a, b, 0) },
+                'D':  { math: { x: 0, y: b, z: 0 }, pos3D: mathTo3D(0, b, 0) },
+                'A\'': { math: { x: 0, y: 0, z: c }, pos3D: mathTo3D(0, 0, c) },
+                'B\'': { math: { x: a, y: 0, z: c }, pos3D: mathTo3D(a, 0, c) },
+                'C\'': { math: { x: a, y: b, z: c }, pos3D: mathTo3D(a, b, c) },
+                'D\'': { math: { x: 0, y: b, z: c }, pos3D: mathTo3D(0, b, c) }
+            };
+        }
+
+        // --- CREATE OXYZ AXES AND GRID ---
+        function createOxyzAxes() {
+            axesGroup = new THREE.Group();
+
+            const axisLength = 9.0;
+
+            // Ox Axis (Red)
+            const ox = createSingleArrow(new THREE.Vector3(0,0,0), new THREE.Vector3(axisLength, 0, 0), colors.ox, false, true);
+            axesGroup.add(ox);
+
+            // Oy Axis (Green - Math Y maps to Three -Z)
+            const oy = createSingleArrow(new THREE.Vector3(0,0,0), new THREE.Vector3(0, 0, -axisLength), colors.oy, false, true);
+            axesGroup.add(oy);
+
+            // Oz Axis (Blue - Math Z maps to Three Y)
+            const oz = createSingleArrow(new THREE.Vector3(0,0,0), new THREE.Vector3(0, axisLength, 0), colors.oz, false, true);
+            axesGroup.add(oz);
+
+            // Oxy Grid Helper
+            gridHelper = new THREE.GridHelper(20, 20, 0x334155, 0x1e293b);
+            gridHelper.position.set(5, -0.01, -5);
+            axesGroup.add(gridHelper);
+
+            scene.add(axesGroup);
+        }
+
+        // --- CREATE RECTANGULAR CUBOID ---
+        function createCuboid() {
+            const group = new THREE.Group();
+
+            // Transparent Box Geometry
+            const geo = new THREE.BoxGeometry(1, 1, 1);
+            const mat = new THREE.MeshPhysicalMaterial({
+                color: colors.cuboidFill,
+                transparent: true,
+                opacity: 0.22,
+                roughness: 0.2,
+                clearcoat: 0.3,
+                side: THREE.DoubleSide
+            });
+            cuboidMesh = new THREE.Mesh(geo, mat);
+            group.add(cuboidMesh);
+
+            // Outer Wireframe Edges
+            const edgeGeo = new THREE.EdgesGeometry(geo);
+            const edgeMat = new THREE.LineBasicMaterial({ color: colors.cuboidBorder, linewidth: 2 });
+            cuboidEdges = new THREE.LineSegments(edgeGeo, edgeMat);
+            group.add(cuboidEdges);
+
+            // Vertex sphere dots
+            const sphereGeo = new THREE.SphereGeometry(0.08, 16, 16);
+            const sphereMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2, emissive: 0x475569 });
+
+            ['A', 'B', 'C', 'D', 'A\'', 'B\'', 'C\'', 'D\''].forEach(vName => {
+                const sp = new THREE.Mesh(sphereGeo, sphereMat);
+                vertexPointMeshes[vName] = sp;
+                group.add(sp);
+            });
+
+            scene.add(group);
+        }
+
+        function createRightAngleGroup() {
+            rightAngleIndicatorsGroup = new THREE.Group();
+            scene.add(rightAngleIndicatorsGroup);
+        }
+
+        /**
+         * SLEEK MATHEMATICAL VECTOR ARROW GENERATOR
+         * Creates thin 3D vectors (slender shaft + sharp cone arrowhead)
+         * Avoids thick phallic cylinders for ideal classroom aesthetics.
+         */
+        function createSingleArrow(p1, p2, colorHex, isResultant = false, isAxis = false) {
+            const group = new THREE.Group();
+
+            const dir = new THREE.Vector3().subVectors(p2, p1);
+            const len = dir.length();
+
+            if (len < 0.001) return group;
+
+            // Sleek slender proportions: Thin line-like shaft (radius ~ 0.02)
+            const headLength = isResultant ? 0.32 : (isAxis ? 0.35 : 0.26);
+            const headRadius = isResultant ? 0.08 : (isAxis ? 0.08 : 0.065);
+            const shaftRadius = isResultant ? 0.025 : (isAxis ? 0.018 : 0.018);
+
+            const actualHeadLen = Math.min(headLength, len * 0.35);
+            const shaftLen = len - actualHeadLen;
+
+            // 1. Slender Line Shaft Cylinder
+            if (shaftLen > 0) {
+                const shaftGeo = new THREE.CylinderGeometry(shaftRadius, shaftRadius, shaftLen, 12);
+                const shaftMat = new THREE.MeshStandardMaterial({
+                    color: colorHex,
+                    emissive: colorHex,
+                    emissiveIntensity: 0.45,
+                    roughness: 0.2,
+                    metalness: 0.5
+                });
+                const shaftMesh = new THREE.Mesh(shaftGeo, shaftMat);
+                shaftMesh.position.set(0, shaftLen / 2, 0);
+                group.add(shaftMesh);
+            }
+
+            // 2. Sharp Mathematical Arrowhead Cone
+            const headGeo = new THREE.ConeGeometry(headRadius, actualHeadLen, 16);
+            const headMat = new THREE.MeshStandardMaterial({
+                color: colorHex,
+                emissive: colorHex,
+                emissiveIntensity: 0.6,
+                roughness: 0.1
+            });
+            const headMesh = new THREE.Mesh(headGeo, headMat);
+            headMesh.position.set(0, shaftLen + actualHeadLen / 2, 0);
+            group.add(headMesh);
+
+            // Orient Arrow along direction vector
+            group.position.copy(p1);
+            group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+
+            return group;
+        }
+
+        // --- CORE GEOMETRY & MATHEMATICAL UPDATE ---
+        function updateScene() {
+            const { a, b, c } = state.dim;
+            const vertices = getCuboidVertices(a, b, c);
+
+            // Update Cuboid Position & Scale
+            cuboidMesh.scale.set(a, c, b);
+            cuboidMesh.position.set(a / 2, c / 2, -b / 2);
+
+            cuboidEdges.scale.set(a, c, b);
+            cuboidEdges.position.set(a / 2, c / 2, -b / 2);
+
+            // Update Vertex Point Spheres
+            Object.keys(vertices).forEach(vName => {
+                if (vertexPointMeshes[vName]) {
+                    vertexPointMeshes[vName].position.copy(vertices[vName].pos3D);
+                }
+            });
+
+            // Adjust Orbit Controls Target Center
+            controls.target.set(a / 2, c / 2, -b / 2);
+
+            // Determine Vector Start/End Points based on Mode & Selection
+            let uStart = vertices[state.u.from].pos3D;
+            let uEnd = vertices[state.u.to].pos3D;
+
+            let vStart = vertices[state.v.from].pos3D;
+            let vEnd = vertices[state.v.to].pos3D;
+
+            let uMath = {
+                x: vertices[state.u.to].math.x - vertices[state.u.from].math.x,
+                y: vertices[state.u.to].math.y - vertices[state.u.from].math.y,
+                z: vertices[state.u.to].math.z - vertices[state.u.from].math.z
+            };
+
+            let vMath = {
+                x: vertices[state.v.to].math.x - vertices[state.v.from].math.x,
+                y: vertices[state.v.to].math.y - vertices[state.v.from].math.y,
+                z: vertices[state.v.to].math.z - vertices[state.v.from].math.z
+            };
+
+            // Remove previous vector meshes
+            if (vecUMesh) scene.remove(vecUMesh);
+            if (vecVMesh) scene.remove(vecVMesh);
+            if (vecWMesh) scene.remove(vecWMesh);
+            if (constructionLinesMesh) scene.remove(constructionLinesMesh);
+            if (parallelogramPlaneMesh) scene.remove(parallelogramPlaneMesh);
+
+            // Remove right angle markers
+            while(rightAngleIndicatorsGroup.children.length > 0){ 
+                rightAngleIndicatorsGroup.remove(rightAngleIndicatorsGroup.children[0]); 
+            }
+
+            // Build Sleek Vector u & v Meshes
+            vecUMesh = createSingleArrow(uStart, uEnd, colors.vecU, false);
+            vecVMesh = createSingleArrow(vStart, vEnd, colors.vecV, false);
+            scene.add(vecUMesh);
+            scene.add(vecVMesh);
+
+            // Resultant Vector Calculations
+            let wMath = { x: 0, y: 0, z: 0 };
+            let wStart = uStart.clone();
+            let wEnd = uStart.clone();
+            let wColor = colors.vecW;
+
+            if (state.mode === 'ADD' || state.mode === 'CUSTOM') {
+                // Vector Addition: w = u + v
+                wMath = {
+                    x: uMath.x + vMath.x,
+                    y: uMath.y + vMath.y,
+                    z: uMath.z + vMath.z
+                };
+                wEnd = mathTo3D(
+                    vertices[state.u.from].math.x + wMath.x,
+                    vertices[state.u.from].math.y + wMath.y,
+                    vertices[state.u.from].math.z + wMath.z
+                );
+                wColor = colors.vecW;
+
+                // Build Construction Lines for Parallelogram Addition
+                if (state.toggles.parallelogram) {
+                    const uShiftEnd = uEnd.clone().add(mathTo3D(vMath.x, vMath.y, vMath.z));
+                    const vShiftEnd = vEnd.clone().add(mathTo3D(uMath.x, uMath.y, uMath.z));
+
+                    const points = [
+                        uEnd.x, uEnd.y, uEnd.z,  uShiftEnd.x, uShiftEnd.y, uShiftEnd.z,
+                        vEnd.x, vEnd.y, vEnd.z,  vShiftEnd.x, vShiftEnd.y, vShiftEnd.z
+                    ];
+
+                    const lineGeo = new THREE.BufferGeometry();
+                    lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+                    const lineMat = new THREE.LineDashedMaterial({ color: 0xf59e0b, dashSize: 0.2, gapSize: 0.15, linewidth: 2 });
+                    constructionLinesMesh = new THREE.LineSegments(lineGeo, lineMat);
+                    constructionLinesMesh.computeLineDistances();
+                    scene.add(constructionLinesMesh);
+
+                    // Shaded Parallelogram Face
+                    const paraGeo = new THREE.BufferGeometry();
+                    const paraVertices = new Float32Array([
+                        uStart.x, uStart.y, uStart.z,
+                        uEnd.x, uEnd.y, uEnd.z,
+                        uShiftEnd.x, uShiftEnd.y, uShiftEnd.z,
+
+                        uStart.x, uStart.y, uStart.z,
+                        uShiftEnd.x, uShiftEnd.y, uShiftEnd.z,
+                        vEnd.x, vEnd.y, vEnd.z
+                    ]);
+                    paraGeo.setAttribute('position', new THREE.BufferAttribute(paraVertices, 3));
+                    paraGeo.computeVertexNormals();
+                    const paraMat = new THREE.MeshBasicMaterial({ color: colors.paraFill, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
+                    parallelogramPlaneMesh = new THREE.Mesh(paraGeo, paraMat);
+                    scene.add(parallelogramPlaneMesh);
+                }
+            }
+            else if (state.mode === 'BOX') {
+                // Parallelepiped Rule: w = AB + AD + AA' = AC'
+                const uB = vertices['B'].math;
+                const vD = vertices['D'].math;
+
+                uMath = { x: uB.x, y: uB.y, z: uB.z };
+                vMath = { x: vD.x, y: vD.y, z: vD.z };
+                
+                wMath = { x: a, y: b, z: c };
+                wStart = vertices['A'].pos3D;
+                wEnd = vertices['C\''].pos3D;
+                wColor = colors.vecBox;
+            }
+            else if (state.mode === 'CROSS') {
+                // Cross Product: w = u x v
+                wMath = {
+                    x: uMath.y * vMath.z - uMath.z * vMath.y,
+                    y: uMath.z * vMath.x - uMath.x * vMath.z,
+                    z: uMath.x * vMath.y - uMath.y * vMath.x
+                };
+
+                wStart = uStart.clone();
+                const wEndMath = {
+                    x: vertices[state.u.from].math.x + wMath.x,
+                    y: vertices[state.u.from].math.y + wMath.y,
+                    z: vertices[state.u.from].math.z + wMath.z
+                };
+                wEnd = mathTo3D(wEndMath.x, wEndMath.y, wEndMath.z);
+                wColor = 0xf59e0b;
+
+                // Shaded Parallelogram spanned by u and v
+                if (state.toggles.parallelogram) {
+                    const uShiftEnd = uEnd.clone().add(mathTo3D(vMath.x, vMath.y, vMath.z));
+
+                    const paraGeo = new THREE.BufferGeometry();
+                    const paraVertices = new Float32Array([
+                        uStart.x, uStart.y, uStart.z,
+                        uEnd.x, uEnd.y, uEnd.z,
+                        uShiftEnd.x, uShiftEnd.y, uShiftEnd.z,
+
+                        uStart.x, uStart.y, uStart.z,
+                        uShiftEnd.x, uShiftEnd.y, uShiftEnd.z,
+                        vStart.x + mathTo3D(vMath.x, vMath.y, vMath.z).x, vStart.y + mathTo3D(vMath.x, vMath.y, vMath.z).y, vStart.z + mathTo3D(vMath.x, vMath.y, vMath.z).z
+                    ]);
+                    paraGeo.setAttribute('position', new THREE.BufferAttribute(paraVertices, 3));
+                    paraGeo.computeVertexNormals();
+                    const paraMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+                    parallelogramPlaneMesh = new THREE.Mesh(paraGeo, paraMat);
+                    scene.add(parallelogramPlaneMesh);
+                }
+
+                // Add Right-Angle Square Indicators to prove orthogonality w ⊥ u and w ⊥ v
+                addRightAngleIndicator(wStart, mathTo3D(wMath.x, wMath.y, wMath.z), mathTo3D(uMath.x, uMath.y, uMath.z));
+                addRightAngleIndicator(wStart, mathTo3D(wMath.x, wMath.y, wMath.z), mathTo3D(vMath.x, vMath.y, vMath.z));
+            }
+
+            // Build Resultant Vector w Mesh
+            vecWMesh = createSingleArrow(wStart, wEnd, wColor, true);
+            scene.add(vecWMesh);
+
+            // Toggle visibility of Axes
+            axesGroup.visible = state.toggles.axes;
+
+            // Update Mathematical Formula Cards & Render KaTeX
+            updateMathUI(uMath, vMath, wMath, vertices);
+            renderMathInPage();
+        }
+
+        // Add 3D Right Angle Square Indicator Mesh
+        function addRightAngleIndicator(origin, dir1, dir2, size = 0.35) {
+            const d1 = dir1.clone().normalize().multiplyScalar(size);
+            const d2 = dir2.clone().normalize().multiplyScalar(size);
+
+            if (d1.length() < 0.01 || d2.length() < 0.01) return;
+
+            const p1 = origin.clone().add(d1);
+            const p2 = origin.clone().add(d1).add(d2);
+            const p3 = origin.clone().add(d2);
+
+            const points = [
+                p1.x, p1.y, p1.z,
+                p2.x, p2.y, p2.z,
+                p2.x, p2.y, p2.z,
+                p3.x, p3.y, p3.z
+            ];
+
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+            const mat = new THREE.LineBasicMaterial({ color: 0xf59e0b, linewidth: 2 });
+            const line = new THREE.LineSegments(geo, mat);
+            rightAngleIndicatorsGroup.add(line);
+        }
+
+        // --- UPDATE MATHEMATICAL KATEX CARDS & CALCULATIONS ---
+        function updateMathUI(u, v, w, vertices) {
+            const badge = document.getElementById('math-status-badge');
+            const sub = document.getElementById('math-status-sub');
+            const card = document.getElementById('math-card-container');
+
+            // Vector magnitudes
+            const magU = Math.sqrt(u.x*u.x + u.y*u.y + u.z*u.z);
+            const magV = Math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+            const magW = Math.sqrt(w.x*w.x + w.y*w.y + w.z*w.z);
+
+            // Dot Product & Angle
+            const dotUV = u.x*v.x + u.y*v.y + u.z*v.z;
+            let cosAngle = (magU * magV > 0) ? (dotUV / (magU * magV)) : 0;
+            cosAngle = Math.max(-1, Math.min(1, cosAngle));
+            const angleDeg = (Math.acos(cosAngle) * 180 / Math.PI).toFixed(1);
+
+            // Render Input Vectors u and v in KaTeX
+            const uName = (state.mode === 'BOX') ? "AB" : `${state.u.from}${state.u.to}`;
+            const vName = (state.mode === 'BOX') ? "AD" : `${state.v.from}${state.v.to}`;
+
+            katex.render(`\\vec{u} = \\vec{${uName}} = (${u.x}, ${u.y}, ${u.z}) \\implies |\\vec{u}| = ${magU.toFixed(2)}`, document.getElementById('katex-u'));
+            katex.render(`\\vec{v} = \\vec{${vName}} = (${v.x}, ${v.y}, ${v.z}) \\implies |\\vec{v}| = ${magV.toFixed(2)}`, document.getElementById('katex-v'));
+
+            if (state.mode === 'ADD' || state.mode === 'CUSTOM') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 glow-cyan";
+                badge.innerText = "PHÉP CỘNG 2 VÉCTƠ";
+                sub.innerText = "Tọa độ tổng = Tổng các tọa độ";
+                card.className = "glass-card rounded-xl p-3 flex flex-col gap-3 border-l-4 border-cyan-500 shadow-xl mt-auto";
+
+                katex.render(`\\vec{w} = \\vec{u} + \\vec{v} = (${u.x}+${v.x},\\, ${u.y}+${v.y},\\, ${u.z}+${v.z})`, document.getElementById('katex-formula'));
+                katex.render(`\\implies \\vec{w} = (${w.x},\\, ${w.y},\\, ${w.z}),\\quad |\\vec{w}| = ${magW.toFixed(2)}`, document.getElementById('katex-result'));
+
+                katex.render(`\\text{Tích vô hướng: } \\vec{u} \\cdot \\vec{v} = ${dotUV} \\implies \\widehat{(\\vec{u}, \\vec{v})} = ${angleDeg}^\\circ`, document.getElementById('katex-dot-angle'));
+                katex.render(`\\text{Diện tích HBH tạo bởi } \\vec{u}, \\vec{v}: S = |\\vec{u} \\times \\vec{v}| = ${Math.sqrt(Math.pow(u.y*v.z - u.z*v.y, 2) + Math.pow(u.z*v.x - u.x*v.z, 2) + Math.pow(u.x*v.y - u.y*v.x, 2)).toFixed(2)}`, document.getElementById('katex-area-vol'));
+            }
+            else if (state.mode === 'BOX') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/40 glow-purple";
+                badge.innerText = "QUY TẮC HÌNH HỘP";
+                sub.innerText = "Đường chéo AC' = AB + AD + AA'";
+                card.className = "glass-card rounded-xl p-3 flex flex-col gap-3 border-l-4 border-purple-500 shadow-xl mt-auto";
+
+                const vol = state.dim.a * state.dim.b * state.dim.c;
+                katex.render(`\\vec{AC'} = \\vec{AB} + \\vec{AD} + \\vec{AA'} = (${u.x}+0+0,\\, 0+${v.y}+0,\\, 0+0+${state.dim.c})`, document.getElementById('katex-formula'));
+                katex.render(`\\implies \\vec{AC'} = (${w.x},\\, ${w.y},\\, ${w.z}),\\quad |\\vec{AC'}| = \\sqrt{${w.x}^2+${w.y}^2+${w.z}^2} = ${magW.toFixed(2)}`, document.getElementById('katex-result'));
+
+                katex.render(`\\text{Tọa độ các đỉnh: } A(0,0,0),\\, C'(${state.dim.a}, ${state.dim.b}, ${state.dim.c})`, document.getElementById('katex-dot-angle'));
+                katex.render(`\\text{Thể tích hình hộp chữ nhật: } V = a \\cdot b \\cdot c = ${vol.toFixed(1)}`, document.getElementById('katex-area-vol'));
+            }
+            else if (state.mode === 'CROSS') {
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 glow-gold";
+                badge.innerText = "TÍCH CÓ HƯỚNG 2 VÉCTƠ";
+                sub.innerText = "Véctơ w vuông góc với cả u và v";
+                card.className = "glass-card rounded-xl p-3 flex flex-col gap-3 border-l-4 border-amber-500 shadow-xl mt-auto";
+
+                // Matrix determinant representation
+                const matrixTex = `\\vec{w} = [\\vec{u}, \\vec{v}] = \\left( \\begin{vmatrix} ${u.y} & ${u.z} \\\\ ${v.y} & ${v.z} \\end{vmatrix},\\, \\begin{vmatrix} ${u.z} & ${u.x} \\\\ ${v.z} & ${v.x} \\end{vmatrix},\\, \\begin{vmatrix} ${u.x} & ${u.y} \\\\ ${v.x} & ${v.y} \\end{vmatrix} \\right)`;
+                katex.render(matrixTex, document.getElementById('katex-formula'));
+                katex.render(`\\implies \\vec{w} = (${w.x},\\, ${w.y},\\, ${w.z}),\\quad |\\vec{w}| = ${magW.toFixed(2)}`, document.getElementById('katex-result'));
+
+                // Verify Orthogonality
+                const dotWU = w.x*u.x + w.y*u.y + w.z*u.z;
+                const dotWV = w.x*v.x + w.y*v.y + w.z*v.z;
+                katex.render(`\\text{Kiểm tra vuông góc: } \\vec{w} \\cdot \\vec{u} = ${dotWU},\\quad \\vec{w} \\cdot \\vec{v} = ${dotWV} \\quad (\\vec{w} \\perp \\vec{u},\\, \\vec{w} \\perp \\vec{v})`, document.getElementById('katex-dot-angle'));
+                katex.render(`\\text{Diện tích HBH tạo bởi } \\vec{u}, \\vec{v}: S = |\\vec{u} \\times \\vec{v}| = ${magW.toFixed(2)}`, document.getElementById('katex-area-vol'));
+            }
+        }
+
+        // --- KATEX AUTO-RENDER HELPER FOR STATIC HTML ELEMENTS ---
+        function renderMathInPage() {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        // --- 3D LABELS PROJECTION TO 2D SCREEN ---
+        const tempVec = new THREE.Vector3();
+        function updateScreenLabels() {
+            const { a, b, c } = state.dim;
+            const vertices = getCuboidVertices(a, b, c);
+
+            // Update Vertex Label Texts & Positions
+            const toggleCoords = state.toggles.coords;
+            Object.keys(vertices).forEach(vName => {
+                const labelId = `lbl-${vName.replace("'", "1")}`;
+                const el = document.getElementById(labelId);
+                if (el) {
+                    if (toggleCoords) {
+                        el.style.display = 'block';
+                        const m = vertices[vName].math;
+                        el.innerText = `${vName}(${m.x}, ${m.y}, ${m.z})`;
+                        updateSingleLabel(labelId, vertices[vName].pos3D);
+                    } else {
+                        el.style.display = 'none';
+                    }
+                }
+            });
+
+            // Update Vector Labels
+            const uStart = vertices[state.u.from].pos3D;
+            const uEnd = vertices[state.u.to].pos3D;
+            const vStart = vertices[state.v.from].pos3D;
+            const vEnd = vertices[state.v.to].pos3D;
+
+            const uMid = uStart.clone().add(uEnd).multiplyScalar(0.5);
+            const vMid = vStart.clone().add(vEnd).multiplyScalar(0.5);
+
+            updateSingleLabel('lbl-vec-u', uMid.add(new THREE.Vector3(0, 0.2, 0)));
+            updateSingleLabel('lbl-vec-v', vMid.add(new THREE.Vector3(0, 0.2, 0)));
+
+            // Label for Resultant Vector w
+            let wStart = uStart.clone();
+            let wMath = {
+                x: vertices[state.u.to].math.x - vertices[state.u.from].math.x,
+                y: vertices[state.u.to].math.y - vertices[state.u.from].math.y,
+                z: vertices[state.u.to].math.z - vertices[state.u.from].math.z
+            };
+            let vMath = {
+                x: vertices[state.v.to].math.x - vertices[state.v.from].math.x,
+                y: vertices[state.v.to].math.y - vertices[state.v.from].math.y,
+                z: vertices[state.v.to].math.z - vertices[state.v.from].math.z
+            };
+
+            let wMid = new THREE.Vector3();
+            const lblW = document.getElementById('lbl-vec-w');
+
+            if (state.mode === 'ADD' || state.mode === 'CUSTOM') {
+                const wEnd = mathTo3D(
+                    vertices[state.u.from].math.x + wMath.x + vMath.x,
+                    vertices[state.u.from].math.y + wMath.y + vMath.y,
+                    vertices[state.u.from].math.z + wMath.z + vMath.z
+                );
+                wMid = uStart.clone().add(wEnd).multiplyScalar(0.5);
+                katex.render(`\\vec{w} = \\vec{u} + \\vec{v}`, lblW);
+            } else if (state.mode === 'BOX') {
+                const wEnd = vertices['C\''].pos3D;
+                wMid = vertices['A'].pos3D.clone().add(wEnd).multiplyScalar(0.5);
+                katex.render(`\\vec{AC'} = \\vec{AB} + \\vec{AD} + \\vec{AA'}`, lblW);
+            } else if (state.mode === 'CROSS') {
+                const crossW = {
+                    x: wMath.y * vMath.z - wMath.z * vMath.y,
+                    y: wMath.z * vMath.x - wMath.x * vMath.z,
+                    z: wMath.x * vMath.y - wMath.y * vMath.x
+                };
+                const wEnd = mathTo3D(
+                    vertices[state.u.from].math.x + crossW.x,
+                    vertices[state.u.from].math.y + crossW.y,
+                    vertices[state.u.from].math.z + crossW.z
+                );
+                wMid = uStart.clone().add(wEnd).multiplyScalar(0.5);
+                katex.render(`\\vec{w} = \\vec{u} \\times \\vec{v}`, lblW);
+            }
+            updateSingleLabel('lbl-vec-w', wMid.add(new THREE.Vector3(0, 0.3, 0)));
+        }
+
+        function updateSingleLabel(elementId, worldPos) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            tempVec.copy(worldPos);
+            tempVec.project(camera);
+
+            if (tempVec.z > 1) {
+                el.style.opacity = '0';
+                return;
+            }
+
+            const widthHalf = container.clientWidth / 2;
+            const heightHalf = container.clientHeight / 2;
+
+            const x = (tempVec.x * widthHalf) + widthHalf;
+            const y = (-(tempVec.y * heightHalf)) + heightHalf;
+
+            el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+            el.style.opacity = '1';
+        }
+
+        // --- ANIMATION LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (state.toggles.autoRotate && controls) {
+                controls.autoRotate = true;
+                controls.autoRotateSpeed = 2.0;
+            } else if (controls) {
+                controls.autoRotate = false;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+            updateScreenLabels();
+        }
+
+        function onWindowResize() {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // --- EVENT LISTENERS & PRESET HANDLERS ---
+        function setupUIEventListeners() {
+            // Dimension sliders
+            ['a', 'b', 'c'].forEach(dimKey => {
+                const slider = document.getElementById(`slider-${dimKey}`);
+                slider.addEventListener('input', (e) => {
+                    state.dim[dimKey] = parseFloat(e.target.value);
+                    document.getElementById(`val-${dimKey}`).innerText = state.dim[dimKey].toFixed(1);
+                    updateScene();
+                });
+            });
+
+            // Dimension reset button
+            document.getElementById('btn-reset-dim').addEventListener('click', () => {
+                state.dim = { a: 4.0, b: 3.0, c: 3.0 };
+                ['a', 'b', 'c'].forEach(k => {
+                    document.getElementById(`slider-${k}`).value = state.dim[k];
+                    document.getElementById(`val-${k}`).innerText = state.dim[k].toFixed(1);
+                });
+                updateScene();
+            });
+
+            // Mode Tabs
+            const modeTabs = {
+                'tab-add': 'ADD',
+                'tab-cross': 'CROSS',
+                'tab-box': 'BOX',
+                'tab-custom': 'CUSTOM'
+            };
+
+            Object.keys(modeTabs).forEach(tabId => {
+                document.getElementById(tabId).addEventListener('click', () => {
+                    document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active', 'border-cyan-500/50', 'bg-cyan-950/40', 'border-amber-500/50', 'bg-amber-950/40', 'border-purple-500/50', 'bg-purple-950/40'));
+                    
+                    state.mode = modeTabs[tabId];
+
+                    const btn = document.getElementById(tabId);
+                    btn.classList.add('active');
+
+                    if (state.mode === 'ADD') {
+                        state.u = { from: 'A', to: 'B' };
+                        state.v = { from: 'A', to: 'D' };
+                    } else if (state.mode === 'CROSS') {
+                        state.u = { from: 'A', to: 'B' };
+                        state.v = { from: 'A', to: 'D' };
+                    } else if (state.mode === 'BOX') {
+                        state.u = { from: 'A', to: 'B' };
+                        state.v = { from: 'A', to: 'D' };
+                    }
+
+                    updateSelectDropdowns();
+                    updateScene();
+                });
+            });
+
+            // Custom Vector Selectors
+            ['u', 'v'].forEach(vecKey => {
+                ['from', 'to'].forEach(dirKey => {
+                    document.getElementById(`sel-${vecKey}-${dirKey}`).addEventListener('change', (e) => {
+                        state[vecKey][dirKey] = e.target.value;
+                        updateScene();
+                    });
+                });
+            });
+
+            // Presets
+            document.getElementById('preset-1').addEventListener('click', () => {
+                state.mode = 'ADD';
+                state.u = { from: 'A', to: 'B' };
+                state.v = { from: 'A', to: 'D' };
+                activateTab('tab-add');
+                updateSelectDropdowns();
+                updateScene();
+            });
+
+            document.getElementById('preset-2').addEventListener('click', () => {
+                state.mode = 'BOX';
+                state.u = { from: 'A', to: 'B' };
+                state.v = { from: 'A', to: 'D' };
+                activateTab('tab-box');
+                updateSelectDropdowns();
+                updateScene();
+            });
+
+            document.getElementById('preset-3').addEventListener('click', () => {
+                state.mode = 'CROSS';
+                state.u = { from: 'A', to: 'B' };
+                state.v = { from: 'A', to: 'D' };
+                activateTab('tab-cross');
+                updateSelectDropdowns();
+                updateScene();
+            });
+
+            document.getElementById('preset-4').addEventListener('click', () => {
+                state.mode = 'CROSS';
+                state.u = { from: 'A', to: 'B' };
+                state.v = { from: 'A', to: 'A\'' };
+                activateTab('tab-cross');
+                updateSelectDropdowns();
+                updateScene();
+            });
+
+            // Toggles
+            document.getElementById('toggle-axes').addEventListener('change', (e) => {
+                state.toggles.axes = e.target.checked;
+                updateScene();
+            });
+            document.getElementById('toggle-coords').addEventListener('change', (e) => {
+                state.toggles.coords = e.target.checked;
+                updateScene();
+            });
+            document.getElementById('toggle-parallelogram').addEventListener('change', (e) => {
+                state.toggles.parallelogram = e.target.checked;
+                updateScene();
+            });
+            document.getElementById('toggle-autorotate').addEventListener('change', (e) => {
+                state.toggles.autoRotate = e.target.checked;
+            });
+
+            // Reset Camera
+            document.getElementById('btn-reset-cam').addEventListener('click', () => {
+                animateCameraTo(new THREE.Vector3(10, 8, 12), new THREE.Vector3(state.dim.a / 2, state.dim.c / 2, -state.dim.b / 2));
+            });
+
+            // Fullscreen
+            document.getElementById('btn-fullscreen').addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(e => console.warn(e));
+                } else {
+                    document.exitFullscreen().catch(e => console.warn(e));
+                }
+            });
+        }
+
+        function activateTab(tabId) {
+            document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function updateSelectDropdowns() {
+            document.getElementById('sel-u-from').value = state.u.from;
+            document.getElementById('sel-u-to').value = state.u.to;
+            document.getElementById('sel-v-from').value = state.v.from;
+            document.getElementById('sel-v-to').value = state.v.to;
+        }
+
+        function animateCameraTo(targetPos, targetLookAt) {
+            const startPos = camera.position.clone();
+            const startLook = controls.target.clone();
+            const startTime = performance.now();
+            const duration = 500;
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+
+                camera.position.lerpVectors(startPos, targetPos, ease);
+                controls.target.lerpVectors(startLook, targetLookAt, ease);
+                controls.update();
+
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        // On Load Entrypoint
+        window.onload = function() {
+            init3D();
+            setupUIEventListeners();
+            renderMathInPage();
+            animate();
+        };
+
+    </script>
+</body>
+</html>
